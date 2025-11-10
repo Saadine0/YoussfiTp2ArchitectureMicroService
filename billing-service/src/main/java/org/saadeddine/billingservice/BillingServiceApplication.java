@@ -13,6 +13,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
+import org.springframework.hateoas.PagedModel;
 
 import java.util.Collection;
 import java.util.Date;
@@ -25,27 +26,35 @@ public class BillingServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(BillingServiceApplication.class, args);
 	}
+
 	@Bean
-	CommandLineRunner commandLineRunner(BillRepository  billRepository,
+	CommandLineRunner commandLineRunner(BillRepository billRepository,
 										ProductItemRepository productItemRepository,
 										CustomerRestClient customerRestClient,
-										ProductRestClient productRestClient){
+										ProductRestClient productRestClient) {
 
 		return args -> {
-			Collection<Customer> customers = customerRestClient.getAllCustomers().getContent();
-			Collection<Product> products = productRestClient.getAllProducts().getContent();
+			// Fetch all customers from Customer Service
+			PagedModel<Customer> customersPaged = customerRestClient.getAllCustomers();
+			Collection<Customer> customers = customersPaged.getContent();
 
+			// Fetch all products from Inventory Service
+			PagedModel<Product> productsPaged = productRestClient.getAllProducts();
+			Collection<Product> products = productsPaged.getContent();
+
+			// Generate bills for each customer
 			customers.forEach(customer -> {
 				Bill bill = Bill.builder()
 						.billingDate(new Date())
 						.customerId(customer.getId())
 						.build();
 				billRepository.save(bill);
+
 				products.forEach(product -> {
 					ProductItem productItem = ProductItem.builder()
 							.bill(bill)
 							.productId(product.getId())
-							.quantity(1+new Random().nextInt(10))
+							.quantity(1 + new Random().nextInt(10))
 							.unitPrice(product.getPrice())
 							.build();
 					productItemRepository.save(productItem);
@@ -53,5 +62,4 @@ public class BillingServiceApplication {
 			});
 		};
 	}
-
 }

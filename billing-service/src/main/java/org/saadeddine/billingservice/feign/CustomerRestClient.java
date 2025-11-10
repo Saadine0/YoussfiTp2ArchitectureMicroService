@@ -6,11 +6,12 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name= "CUSTOMERSERVICE")
+@FeignClient(name = "CUSTOMERSERVICE")
 public interface CustomerRestClient {
-    @GetMapping("/api/customers/{id}")
-    Customer findCustomerById(@PathVariable Long Id);
 
-    @GetMapping("/api/customers")
-    PagedModel<Customer> getAllCustomers();
+    @GetMapping("/customers")
+    PagedModel<Customer> getAllCustomers();  // HAL JSON
+
+    @GetMapping("/customers/{id}")
+    Customer findCustomerById(@PathVariable Long id);
 }

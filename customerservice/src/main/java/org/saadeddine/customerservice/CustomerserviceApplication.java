@@ -1,6 +1,7 @@
 package org.saadeddine.customerservice;
 
 
+import org.saadeddine.customerservice.config.CustomerConfigParams;
 import org.saadeddine.customerservice.entities.Customer;
 import org.saadeddine.customerservice.repository.CustomerRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -10,6 +11,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
+@EnableConfigurationProperties(CustomerConfigParams.class)
 public class CustomerserviceApplication {
 
 	public static void main(String[] args) {
